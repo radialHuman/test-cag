@@ -176,7 +176,7 @@ def kvcache_test(args: argparse.Namespace):
     answer_instruction = "Answer the question with a super short answer."
     text_list, dataset = get_training_data()
 
-    kvcache_path = "./data_cache/cache_knowledges.pt"
+    kvcache_path = "./data_cache/cache_knowledges_2.pt"
 
     knowledges = '\n\n\n\n\n\n'.join(text_list)
     knowledge_cache, prepare_time = prepare_kvcache(knowledges, filepath=kvcache_path, answer_instruction=answer_instruction)
@@ -214,37 +214,37 @@ def kvcache_test(args: argparse.Namespace):
         # Generate Response for the question
         knowledges = '\n\n\n'.join(text_list)
 
-        if args.usePrompt:
-            prompt = f"""
-    <|begin_of_text|>
-    <|start_header_id|>system<|end_header_id|>
-    You are an assistant for giving short answers based on given context.<|eot_id|>
-    <|start_header_id|>user<|end_header_id|>
-    Context information is bellow.
-    ------------------------------------------------
-    {knowledges}
-    ------------------------------------------------
-    {answer_instruction}
-    Question:
+    #     if args.usePrompt:
+    #         prompt = f"""
+    # <|begin_of_text|>
+    # <|start_header_id|>system<|end_header_id|>
+    # You are an assistant for giving short answers based on given context.<|eot_id|>
+    # <|start_header_id|>user<|end_header_id|>
+    # Context information is bellow.
+    # ------------------------------------------------
+    # {knowledges}
+    # ------------------------------------------------
+    # {answer_instruction}
+    # Question:
+    # {question}<|eot_id|>
+    # <|start_header_id|>assistant<|end_header_id|>
+    # """
+    #         generate_t1 = time()
+    #         input_ids = tokenizer.encode(prompt, return_tensors="pt").to(model.device)
+    #         output = generate(model, input_ids, DynamicCache()) 
+    #         generated_text = tokenizer.decode(output[0], skip_special_tokens=True, temperature=None)
+    #         generate_t2 = time()
+    #     else:
+        prompt = f"""
     {question}<|eot_id|>
     <|start_header_id|>assistant<|end_header_id|>
     """
-            generate_t1 = time()
-            input_ids = tokenizer.encode(prompt, return_tensors="pt").to(model.device)
-            output = generate(model, input_ids, DynamicCache()) 
-            generated_text = tokenizer.decode(output[0], skip_special_tokens=True, temperature=None)
-            generate_t2 = time()
-        else:
-            prompt = f"""
-    {question}<|eot_id|>
-    <|start_header_id|>assistant<|end_header_id|>
-    """
-            generate_t1 = time()
-            clean_up(knowledge_cache, kv_len)
-            input_ids = tokenizer.encode(prompt, return_tensors="pt").to(model.device)
-            output = generate(model, input_ids, knowledge_cache)
-            generated_text = tokenizer.decode(output[0], skip_special_tokens=True, temperature=None)
-            generate_t2 = time()
+        generate_t1 = time()
+        clean_up(knowledge_cache, kv_len)
+        input_ids = tokenizer.encode(prompt, return_tensors="pt").to(model.device)
+        output = generate(model, input_ids, knowledge_cache)
+        generated_text = tokenizer.decode(output[0], skip_special_tokens=True, temperature=None)
+        generate_t2 = time()
 
         # print("D: ", knowledges)
         print("Q: ", question)
