@@ -10,7 +10,9 @@ from transformers.cache_utils import DynamicCache
 import logging 
 from typing import Union
 
-
+#TODO rmove this 
+import torch._dynamo
+torch._dynamo.config.suppress_errors = True
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -317,7 +319,7 @@ if __name__ == "__main__":
     parser.add_argument('--modelname', required=False, default="./model/bitnet-b1.58-2B-4T", type=str, help='Model name to use')
     # parser.add_argument('--quantized', required=False, default=False, type=bool, help='Quantized model')
     parser.add_argument('--kvcache', choices=['file'], required=True, help='Method to use (from_file or from_var)')
-    # parser.add_argument('--similarity', choices=['bertscore'], required=True, help='Similarity metric to use (bertscore)')
+    parser.add_argument('--similarity', choices=['bertscore'], required=True, help='Similarity metric to use (bertscore)')
     parser.add_argument('--output', required=True, type=str, help='Output file to save the results')
     # parser.add_argument('--maxQuestion', required=False, default=None, type=int, help='Maximum number of questions to test')
     # parser.add_argument('--maxKnowledge', required=False, default=None, type=int, help='Maximum number of knowledge items to use')
