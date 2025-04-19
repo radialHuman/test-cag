@@ -29,7 +29,8 @@ def _parse_squad_data(raw):
             article.append(para["context"])
             for qa in para["qas"]:
                 ques = qa["question"]
-                answers = [ans["text"] for ans in qa["answers"]]
+                # answers = [ans["text"] for ans in qa["answers"]]
+                answers = qa["answers"]
                 dataset["qas"].append(
                     {
                         "title": data["title"],
@@ -45,8 +46,8 @@ def _parse_squad_data(raw):
     return dataset
 
 
-def get_training_data() -> tuple[list[str], Iterator[tuple[str, str]]]:
-    with open("../input/get_training_data", "r") as file:
+def get_training_data(file_path : str = "input/training_data_1.json") -> tuple[list[str], Iterator[tuple[str, str]]]:
+    with open(file_path, "r") as file:
         data = json.load(file)
     parsed_data = _parse_squad_data(data)
     text_list = []

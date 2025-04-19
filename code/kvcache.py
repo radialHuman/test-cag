@@ -10,9 +10,10 @@ from transformers.cache_utils import DynamicCache
 import logging 
 from typing import Union
 
-#TODO rmove this 
+#TODO rmove these 3
 import torch._dynamo
 torch._dynamo.config.suppress_errors = True
+# os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -31,7 +32,8 @@ global model_name, model, tokenizer
 global rand_seed
 
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = "cpu" # <===== TODO change this
 logger.info(f"Using device: {device}")
 
 
@@ -193,9 +195,9 @@ def kvcache_test(args: argparse.Namespace):
 
     dataset = list(dataset)  # Convert the dataset to a list
 
-    max_questions = min(len(dataset), args.maxQuestion) if args.maxQuestion is not None else len(dataset)
+    # max_questions = min(len(dataset), args.maxQuestion) if args.maxQuestion is not None else len(dataset)
     # Retrieve the knowledge from the vector database
-    for id, (question, ground_truth) in enumerate(dataset[:max_questions]):
+    for id, (question, ground_truth) in enumerate(dataset[:]):
         torch.cuda.empty_cache()
         torch.cuda.ipc_collect()
 
@@ -346,7 +348,8 @@ if __name__ == "__main__":
     model = AutoModelForCausalLM.from_pretrained(
             model_name,
             torch_dtype=torch.float16,
-            device_map="cuda",
+            device_map="cpu", # <==== TODO change this
+            
         )
 
     def unique_path(path, i=0):
@@ -358,4 +361,4 @@ if __name__ == "__main__":
     if os.path.exists(args.output):
         args.output = unique_path(args.output)
 
-    # kvcache_test(args)
+    kvcache_test(args)

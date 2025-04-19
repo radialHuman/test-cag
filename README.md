@@ -13,8 +13,10 @@
 - If possible do a rag thing and comapre the same
 
 ## Run
+ .\venv\Scripts\activate 
 python .\code\kvcache.py --kvcache file --similarity bertscore --output "./output/result_1.txt"
 
 ## TODO
 1. speed : run questions via non chaced and compare with cached one
+    - check why the answers are useless
 2. accuracy : make a rag and compare with cag
